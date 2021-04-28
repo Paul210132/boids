@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Boids</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <div id="container" onclick="clickToAddBoid(event)"></div>
+    <aside id="dragme" draggable="true">
+      <div class="row">
+        <button type="button" name="button" onclick="addBoid()">➕</button>
+        <button type="button" name="button" onclick="clearBoids()">✖️</button>
+        <button type="button" id="play" onclick="togglePlay()">▶️</button>
+        <button type="button" id="toggleNight" onclick="toggleNight()" name="button">🌚</button>
+      </div>
+      <!-- <button type="button" id="stop" onclick="stop()">■</button> -->
+      <div class="">
+        <label for="modeSelect">Mode selector</label>
+        <select class="" name="modeSelect" onchange="switchMode()">
+          <option value="random">Random</option>
+          <option value="flock">Flock</option>
+          <option value="gravity">Gravity</option>
+        </select>
+      </div>
+      <div class="">
+        <label for="edgeWidth">Edge width</label>
+        <input type="text" id="edgeWidth" name="edgeWidth" onchange="updateSettings()" value="2">
+      </div>
+      <div class="">
+        <label for="speedModifier">Speed modifier</label>
+        <input type="text" id="speedModifier" name="speedModifier" onchange="updateSettings()" value=".1">
+      </div>
+      <div class="">
+        <label for="boidSize">Boid size</label>
+        <input type="text" id="boidSize" name="boidSize" onchange="updateSettings()" value="10">
+      </div>
+    </aside>
+
+
+    <script src="index.js" charset="utf-8"></script>
+  </body>
+</html>

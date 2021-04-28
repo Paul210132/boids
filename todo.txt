@@ -1,0 +1,18 @@
+## Flock mode :
+    * acquisition : proximity
+    * proximity causes course to alter to average vector V' = ( Va + Vb ) / 2
+## merge mode :
+    * acquisition : contact
+    * collision merges 2 boids into 1
+    * collided boids each transfer half their graphical properties to merger result
+## zombie mode :
+    * acquisition : proximity
+    * zombie shift : contact
+    * select boid insert type, zombie or normal
+    * if normal random motion, flee acquired zombie if in range
+    * if zombie random motion, chase acquired boid if in range
+## mitosis mode
+    * acquisition : contact
+    * collision creates a new boid
+    * collided boids each transfer half their graphical properties to mitosis result
+    *
