@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>Boids</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./index.css">
   </head>
   <body>
     <div id="container" onclick="clickToAddBoid(event)"></div>
     <aside id="dragme" draggable="true">
-      <div class="row">
+      <div class="row" onmousedown="grabPanel()" onmouseup="dropPanel()">
         <button type="button" name="button" onclick="addBoid()">➕</button>
         <button type="button" name="button" onclick="clearBoids()">✖️</button>
         <button type="button" id="play" onclick="togglePlay()">▶️</button>
@@ -38,6 +38,6 @@
     </aside>
 
 
-    <script src="index.js" charset="utf-8"></script>
+    <script src="./bundle.js" charset="utf-8"></script>
   </body>
 </html>
