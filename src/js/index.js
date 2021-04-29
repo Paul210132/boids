@@ -1,19 +1,30 @@
 import boid from './boid.js';
-import painter from './painter.js';
+import generateRandomBG from './painter.js';
+import _settings from './settings.js';
 
+let settings = new _settings();
 let boids = [];
-let edgeWidth = 10;
-let speedModifier = .050;
-let interval = 100;
-let boidSize = 10;
-let mode = "random";
-let play = false;
-let night = false;
 let cont = document.getElementById("container");
 cont.style.width = innerWidth;
 cont.style.height = innerHeight;
-painter.generateRandomBG();
-
+generateRandomBG(settings.night);
+let componentMap = [
+  {id:"clickToAddBoid",event:"click",f:clickToAddBoid},
+  {id:"clearBoids",event:"click",f:clearBoids},
+  {id:"togglePlay",event:"click",f:togglePlay},
+  {id:"toggleNight",event:"click",f:toggleNight},
+  {id:"dragme",event:"mousedown",f:grabPanel},
+  {id:"dragme",event:"mouseenter",f:hoverPanel},
+  {id:"dragme",event:"mouseleave",f:dropPanel},
+  {id:"edgeWidth",event:"focusout",f:updateSettingsFromInput},
+  {id:"speedModifier",event:"focusout",f:updateSettingsFromInput},
+  {id:"boidSize",event:"focusout",f:updateSettingsFromInput},
+  {id:"switchMode",event:"focusout",f:updateSettingsFromInput},
+];
+componentMap.forEach((item) => {
+  const btn = document.getElementById(item.id);
+  btn.addEventListener(item.event,item.f);
+});
 function drag_start(event) {
     var style = window.getComputedStyle(event.target, null);
     event.dataTransfer.setData("text/plain",
@@ -31,31 +42,27 @@ function drop(event) {
     event.preventDefault();
     return false;
 }
-function grabPanel() {
-  document.body.style.cursor = "grabbing";
-}
-function dropPanel() {
-  document.body.style.cursor = "grab";
-}
 var dm = document.getElementById('dragme');
 dm.addEventListener('dragstart',drag_start,false);
 document.body.addEventListener('dragover',drag_over,false);
 document.body.addEventListener('drop',drop,false);
-
-function updateSettings() {
-  edgeWidth = document.getElementById("edgeWidth").value;
-  speedModifier = document.getElementById("speedModifier").value;
-  //interval = document.getElementById("interval").value;
-  boidSize = document.getElementById("boidSize").value;
+function grabPanel() {
+  setCursor("grabbing");
+} function hoverPanel() {
+  setCursor("grab");
+} function dropPanel() {
+  setCursor("default");
+} function setCursor(cursor) {
+  document.body.style.cursor = cursor;
 }
 
-function switchMode() {
-  mode = event.currentTarget.value;
+function updateSettingsFromInput() {
+  settings.updateSettingsFromInput();
 }
 
 function addBoid(x,y,vx,vy,color,size) {
-  let b = new boid(x,y,vx,vy,color,size);
-  b.renderBoid();
+  let b = new boid(x,y,vx,vy,color,size,t);
+  b.renderBoid(settings, boids, t);
 //  b.setMotion();
   boids.push(b);
 }
@@ -78,32 +85,32 @@ function logBoidSpeed(){
 }
 function clickToAddBoid(event) {
   //console.log(event);
-  addBoid(event.clientX,event.clientY);
+  addBoid(/*event.clientX,event.clientY*/);
 }
 
 let t = 0;
-let timeLoop = setInterval(timer, interval);
+let timeLoop = setInterval(timer, settings.interval);
 function timer() {
-  if(play){
+  if(settings.play){
     t++;
     //updateSettings();
     //if(t%2000) logBoidSpeed();
-    boids.map(boid => boid.renderBoid());
+    boids.map(boid => boid.renderBoid(settings, boids, t));
   }
 }
 
 function togglePlay() {
-  play = !play;
-  let btn = document.getElementById("play");
-  btn.innerHTML = play ? "⏸️": "▶️";
+  settings.togglePlay();
+  let btn = document.getElementById("togglePlay");
+  btn.innerHTML = settings.play ? "⏸️": "▶️";
 }
 function toggleNight() {
-  night = !night;
+  settings.toggleNight();
   let btn = document.getElementById("toggleNight");
-  btn.innerHTML = night ? "🌝":"🌚";
-  painter.generateRandomBG();
+  btn.innerHTML = settings.night ? "🌝":"🌚";
+  generateRandomBG(settings.night);
 }
 function stop() {
-  play = false;
+  settings.play = false;
   clearInterval(timeLoop);
 }

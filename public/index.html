@@ -6,18 +6,19 @@
     <link rel="stylesheet" href="./index.css">
   </head>
   <body>
-    <div id="container" onclick="clickToAddBoid(event)"></div>
+    <div id="container"></div>
     <aside id="dragme" draggable="true">
-      <div class="row" onmousedown="grabPanel()" onmouseup="dropPanel()">
-        <button type="button" name="button" onclick="addBoid()">➕</button>
-        <button type="button" name="button" onclick="clearBoids()">✖️</button>
-        <button type="button" id="play" onclick="togglePlay()">▶️</button>
-        <button type="button" id="toggleNight" onclick="toggleNight()" name="button">🌚</button>
+      <div class="row">
+      <!-- onmousedown="grabPanel()" onmouseup="dropPanel()"> -->
+        <button type="button" id="clickToAddBoid">➕</button>
+        <button type="button" id="clearBoids">✖️</button>
+        <button type="button" id="togglePlay">⏸️</button>
+        <button type="button" id="toggleNight">🌚</button>
       </div>
       <!-- <button type="button" id="stop" onclick="stop()">■</button> -->
       <div class="">
         <label for="modeSelect">Mode selector</label>
-        <select class="" name="modeSelect" onchange="switchMode()">
+        <select class="" name="modeSelect" id="switchMode">
           <option value="random">Random</option>
           <option value="flock">Flock</option>
           <option value="gravity">Gravity</option>
@@ -25,15 +26,15 @@
       </div>
       <div class="">
         <label for="edgeWidth">Edge width</label>
-        <input type="text" id="edgeWidth" name="edgeWidth" onchange="updateSettings()" value="2">
+        <input type="text" id="edgeWidth" name="edgeWidth" value="2">
       </div>
       <div class="">
         <label for="speedModifier">Speed modifier</label>
-        <input type="text" id="speedModifier" name="speedModifier" onchange="updateSettings()" value=".1">
+        <input type="text" id="speedModifier" name="speedModifier" value=".1">
       </div>
       <div class="">
         <label for="boidSize">Boid size</label>
-        <input type="text" id="boidSize" name="boidSize" onchange="updateSettings()" value="10">
+        <input type="text" id="boidSize" name="boidSize" value="10">
       </div>
     </aside>
 

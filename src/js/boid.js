@@ -1,58 +1,70 @@
+import {generateRandomBGColor} from './painter.js';
+import _settings from './settings.js';
+
 export default class boid {
-  constructor(x,y,vx,vy,color,size) {
+  constructor(x,y,vx,vy,color,size,t, settings) {
+    this.settings = settings || new _settings();
     this.id = t;
-    this.setGeometricalProperties(x,y,vx,vy);
+    this.initGeometricalProperties(x,y,vx,vy);
     this.boidElement = document.createElement("DIV");
-    this.boidElement.className = "boid";
-    this.boidElement.style.background = generateRandomBGColor(color,true,0,randomFloatFromIndexToOne);
-    let s = size ? size : boidSize;
-    this.boidElement.style.height = 5*s+"px";
-    this.boidElement.style.width = 5*s+"px";
-    this.boidElement.style.borderRadius = 4*s+"px";
+    this.updateGraphicalProperties(size, color);
     document.body.appendChild(this.boidElement);
   }
 
-  setGraphicalProperties(color,size){
-
+  updateGraphicalProperties(size, color){
+    this.boidElement.className = "boid";
+    this.color = color || generateRandomBGColor(this.color,true,0,false);
+    this.boidElement.style.background = this.color;
+    let s = size ? size : this.settings.boidSize;
+    this.boidElement.style.height = 5*s+"px";
+    this.boidElement.style.width = 5*s+"px";
+    this.boidElement.style.borderRadius = 4*s+"px";
   }
-  setGeometricalProperties(x,y,vx,vy){
+  initGeometricalProperties(x,y,vx,vy,settings){
     this.x = x ? x : Math.random()*window.innerWidth*.90;
     this.y = y ? y : Math.random()*window.innerHeight*.90;
-    this.vx = vx ? vx : (2*Math.random()-1)*speedModifier;
-    this.vy = vy ? vy : (2*Math.random()-1)*speedModifier;
+    this.vx = (2*Math.random()-1);
+    this.vy= (2*Math.random()-1);
+    this.updateSpeedVector(vx, vy)
   }
-  renderBoid(){
+  updateSpeedVector(vx, vy){
+    this.vx_calc = vx ? vx : this.vx*this.settings.speedModifier;
+    this.vy_calc = vy ? vy : this.vy*this.settings.speedModifier;
+  }
+  renderBoid(settings, boids, t){
+   this.settings = settings;
+   this.updateGraphicalProperties(settings.boidSize)
    this.boidElement.style.left = this.x+"px";
    this.boidElement.style.top = this.y+"px";
    //console.log("x:"+this.x+",y:"+this.y);
-   this.applyBehavior();
+   this.applyBehavior(boids);
    this.bounceOffEdge();
-
-   this.x+= this.vx*t;
-   this.y+= this.vy*t;
+   this.updateSpeedVector();
+   this.x+= this.vx_calc*t;
+   this.y+= this.vy_calc*t;
  }
 
  bounceOffEdge(){
    //bounce off the edge
-   if(this.x > .96*(window.innerWidth - edgeWidth) || this.x < edgeWidth){
+   if(this.x > .96*(window.innerWidth - this.settings.edgeWidth) || this.x < this.settings.edgeWidth){
      //right/left edge
      this.vx = -this.vx;
      //console.log("bounce : x="+this.x+" edge="+window.innerWidth);
-   }if(this.y > .93*(window.innerHeight - edgeWidth) || this.y < edgeWidth){
+   }if(this.y > .93*(window.innerHeight - this.settings.edgeWidth) || this.y < this.settings.edgeWidth){
      //top/btm edge
      this.vy = -this.vy;
      //console.log("bounce : y="+this.y+" edge="+window.innerHeight);
    }
  }
 
- applyBehavior(){
-   if(mode == "gravity"){
-     this.vy += .1 * speedModifier;
+ applyBehavior(boids){
+   if(this.settings.mode == "gravity"){
+     this.vy += .1 * this.settings.speedModifier;
    } else {
      boids.forEach((boid) => {
        if(boid.id!=this.id){
          if(this.detectCollision(boid)) this.steerClear(boid);
-         switch (mode) {
+         switch (this.settings.mode) {
            case "flock":
             //Intercept boids in the vicinity
             if(this.detectProximity(boid)) this.flock(boid);
@@ -71,10 +83,10 @@ export default class boid {
    return (this.distanceToBoid(boid) < distance);
  }
  detectProximity(boid){
-   return this.detectDistance(boid, boidSize*12);
+   return this.detectDistance(boid, this.settings.boidSize*12);
  }
  detectCollision(boid){
-   let collision = this.detectDistance(boid, boidSize*5)
+   let collision = this.detectDistance(boid, this.settings.boidSize*5)
    /*if(collision){
      console.log("collision");
      console.log(boid.toString());
