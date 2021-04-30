@@ -18,6 +18,7 @@ export default class boid {
     this.boidElement.id = this.id;
   }
 
+  // ---------------- UI ---------------- //
   updateGraphicalProperties(){
     this.boidElement.className = "boid";
     this.color = generateRandomBGColor(this.color,true,0,false);
@@ -30,23 +31,6 @@ export default class boid {
     this.boidElement.style.transform = updatedPosition;
     let borderColor = this.selected ? "darkred":"black";
     this.boidElement.style.borderColor = borderColor;
-  }
-  initGeometricalProperties(){
-    this.x = Math.random()*window.innerWidth*.90;
-    this.y = Math.random()*window.innerHeight*.90;
-    this.vx = (2*Math.random()-1);
-    this.vy= (2*Math.random()-1);
-    this.updateSpeedVector()
-  }
-
-  updateSpeedVector(){
-    let r = Math.sqrt(this.vx*this.vx+this.vy*this.vy);
-    let alpha = this.vy<0 ? this.vx/Math.abs(this.vx)*180 : 0;
-    let phi = Math.atan(this.vx/this.vy)*180/Math.PI;
-    this.phi = (phi + alpha);
-    if(this.selected) console.log(this.toString());
-    this.vx_calc = this.vx*this.settings.speedModifier;
-    this.vy_calc = this.vy*this.settings.speedModifier;
   }
   renderBoid(settings, boids, t){
    this.settings = settings;
@@ -61,48 +45,35 @@ export default class boid {
    this.y+= -this.vy_calc*t;
  }
 
- bounceOffEdge(){
-   //bounce off the edge
-   if(this.x > .96*(window.innerWidth - this.settings.edgeWidth) || this.x < this.settings.edgeWidth){
-     //right/left edge
-     this.vx = -this.vx;
-     //console.log("bounce : x="+this.x+" edge="+window.innerWidth);
-   }if(this.y > .93*(window.innerHeight - this.settings.edgeWidth) || this.y < this.settings.edgeWidth){
-     //top/btm edge
-     this.vy = -this.vy;
-     //console.log("bounce : y="+this.y+" edge="+window.innerHeight);
-   }
- }
+ // ---------------- Behavior ---------------- //
+  applyBehavior(boids){
+    if(this.settings.mode == "gravity"){
+      this.vy += .1 * this.settings.speedModifier;
+    } else {
+      this.acquireFriends(boids);
+      this.friends.forEach((boid) => {
+        if(this.detectCollision(boid)) this.steerClear(boid);
+        switch (this.settings.mode) {
+          case "flock":
+           //Intercept boids in the vicinity
+           if(this.detectProximity(boid)) this.flock(boid);
+          default:
+        }
+      });
+    }
+  }
+  acquireFriends(boids){
+    this.friends = [];
+    boids.forEach((boid) => {
+      if(this.id!=boid.id){
+       if(this.detectDistance(boid, this.settings.boidSize*12)){ this.friends.push(boid);}
+      }
+    });
+  }
 
- applyBehavior(boids){
-   if(this.settings.mode == "gravity"){
-     this.vy += .1 * this.settings.speedModifier;
-   } else {
-     this.acquireFriends(boids);
-     this.friends.forEach((boid) => {
-       if(this.detectCollision(boid)) this.steerClear(boid);
-       switch (this.settings.mode) {
-         case "flock":
-          //Intercept boids in the vicinity
-          if(this.detectProximity(boid)) this.flock(boid);
-         default:
-       }
-     });
-   }
- }
- acquireFriends(boids){
-   this.friends = [];
-   boids.forEach((boid) => {
-     if(this.id!=boid.id){
-      if(this.detectDistance(boid, this.settings.boidSize*12)){ this.friends.push(boid);}
-     }
-   });
- }
- distanceToBoid(boid){
-   let d = Math.sqrt((this.x-boid.x)*(this.x-boid.x)+(this.y-boid.y)*(this.y-boid.y));
-   //console.log("dist #"+this.id+" to #"+boid.id+" : "+d);
-   return d;
- }
+ // ---------------- Position ---------------- //
+
+ // ---------------- Eval ---------------- //
  detectDistance(boid, distance){
    return (this.distanceToBoid(boid) < distance);
  }
@@ -118,6 +89,50 @@ export default class boid {
    }*/
    return collision;
  }
+ distanceToBoid(boid){
+   let d = Math.sqrt((this.x-boid.x)*(this.x-boid.x)+(this.y-boid.y)*(this.y-boid.y));
+   //console.log("dist #"+this.id+" to #"+boid.id+" : "+d);
+   return d;
+ }
+ dx(boid){
+   return boid.x-this.x;
+ }
+ dy(boid){
+   return boid.y-this.y;
+ }
+
+// ---------------- Modify ---------------- //
+initGeometricalProperties(){
+  this.x = Math.random()*window.innerWidth*.90;
+  this.y = Math.random()*window.innerHeight*.90;
+  this.vx = (2*Math.random()-1);
+  this.vy= (2*Math.random()-1);
+  this.r = Math.sqrt(this.vx*this.vx+this.vy*this.vy);
+  this.updateSpeedVector();
+}
+// ---------------- Speed ---------------- //
+
+// ---------------- Modify ---------------- //
+updateSpeedVector(){
+  let alpha = this.vy<0 ? this.vx/Math.abs(this.vx)*180 : 0;
+  let phi = Math.atan(this.vx/this.vy)*180/Math.PI;
+  this.phi = (phi + alpha);
+  if(this.selected) console.log(this.toString());
+  this.vx_calc = this.vx*this.settings.speedModifier;
+  this.vy_calc = this.vy*this.settings.speedModifier;
+}
+ bounceOffEdge(){
+   //bounce off the edge
+   if(this.x > .96*(window.innerWidth - this.settings.edgeWidth) || this.x < this.settings.edgeWidth){
+     //right/left edge
+     this.vx = -this.vx;
+     //console.log("bounce : x="+this.x+" edge="+window.innerWidth);
+   }if(this.y > .93*(window.innerHeight - this.settings.edgeWidth) || this.y < this.settings.edgeWidth){
+     //top/btm edge
+     this.vy = -this.vy;
+     //console.log("bounce : y="+this.y+" edge="+window.innerHeight);
+   }
+ }
  flock(boid){
    this.vx = (.7*this.vx+.3*boid.vx/*+this.dx(boid)*/);
    this.vy = (.7*this.vy+.3*boid.vy/*+this.dy(boid)*/);
@@ -126,12 +141,8 @@ export default class boid {
    this.vx = -this.vx;// this.dx(boid)/2;
    this.vy = -this.vy;// this.dy(boid)/2;
  }
- dx(boid){
-   return boid.x-this.x;
- }
- dy(boid){
-   return boid.y-this.y;
- }
+
+ // ---------------- Debug ---------------- //
  toString(){
    return ("Boid#"+this.id+"\nx: "+this.x+"\ny: "+this.y+"\nvx: "+this.vx+"\nvy: "+this.vy+"\nphi: "+this.phi);
  }
