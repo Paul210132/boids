@@ -2,46 +2,63 @@ import {generateRandomBGColor} from './painter.js';
 import _settings from './settings.js';
 
 export default class boid {
-  constructor(x,y,vx,vy,color,size,t, settings) {
+  constructor(settings) {
     this.settings = settings || new _settings();
-    this.id = t;
-    this.initGeometricalProperties(x,y,vx,vy);
+    this.selected = false;
+    this.id = this.settings.generateId();
+    this.friends = [];
+    this.phi = 0;
+    this.initGeometricalProperties();
     this.boidElement = document.createElement("DIV");
-    this.updateGraphicalProperties(size, color);
+    this.boidElement.innerHTML = "<b>"+this.id+"</b>";
+    this.updateGraphicalProperties();
     document.body.appendChild(this.boidElement);
+    this.boidElement.addEventListener("click",this.selectBoid.bind(this));
+    this.boidElement.addEventListener("hover",this.hoverBoid);
+    this.boidElement.id = this.id;
   }
 
-  updateGraphicalProperties(size, color){
+  updateGraphicalProperties(){
     this.boidElement.className = "boid";
-    this.color = color || generateRandomBGColor(this.color,true,0,false);
+    this.color = generateRandomBGColor(this.color,true,0,false);
     this.boidElement.style.background = this.color;
-    let s = size ? size : this.settings.boidSize;
+    let s = this.settings.boidSize;
     this.boidElement.style.height = 5*s+"px";
     this.boidElement.style.width = 5*s+"px";
     this.boidElement.style.borderRadius = 4*s+"px";
+    let updatedPosition = "translate("+this.x+"px,"+this.y+"px) rotate("+this.phi+"deg)";
+    this.boidElement.style.transform = updatedPosition;
+    let borderColor = this.selected ? "darkred":"black";
+    this.boidElement.style.borderColor = borderColor;
   }
-  initGeometricalProperties(x,y,vx,vy,settings){
-    this.x = x ? x : Math.random()*window.innerWidth*.90;
-    this.y = y ? y : Math.random()*window.innerHeight*.90;
+  initGeometricalProperties(){
+    this.x = Math.random()*window.innerWidth*.90;
+    this.y = Math.random()*window.innerHeight*.90;
     this.vx = (2*Math.random()-1);
     this.vy= (2*Math.random()-1);
-    this.updateSpeedVector(vx, vy)
+    this.updateSpeedVector()
   }
-  updateSpeedVector(vx, vy){
-    this.vx_calc = vx ? vx : this.vx*this.settings.speedModifier;
-    this.vy_calc = vy ? vy : this.vy*this.settings.speedModifier;
+
+  updateSpeedVector(){
+    let r = Math.sqrt(this.vx*this.vx+this.vy*this.vy);
+    let alpha = this.vy<0 ? this.vx/Math.abs(this.vx)*180 : 0;
+    let phi = Math.atan(this.vx/this.vy)*180/Math.PI;
+    this.phi = (phi + alpha);
+    if(this.selected) console.log(this.toString());
+    this.vx_calc = this.vx*this.settings.speedModifier;
+    this.vy_calc = this.vy*this.settings.speedModifier;
   }
   renderBoid(settings, boids, t){
    this.settings = settings;
-   this.updateGraphicalProperties(settings.boidSize)
-   this.boidElement.style.left = this.x+"px";
-   this.boidElement.style.top = this.y+"px";
+   this.updateGraphicalProperties(settings.boidSize);
+
+   // this.boidElement.style.top = this.y+"px";
    //console.log("x:"+this.x+",y:"+this.y);
    this.applyBehavior(boids);
    this.bounceOffEdge();
    this.updateSpeedVector();
    this.x+= this.vx_calc*t;
-   this.y+= this.vy_calc*t;
+   this.y+= -this.vy_calc*t;
  }
 
  bounceOffEdge(){
@@ -61,18 +78,25 @@ export default class boid {
    if(this.settings.mode == "gravity"){
      this.vy += .1 * this.settings.speedModifier;
    } else {
-     boids.forEach((boid) => {
-       if(boid.id!=this.id){
-         if(this.detectCollision(boid)) this.steerClear(boid);
-         switch (this.settings.mode) {
-           case "flock":
-            //Intercept boids in the vicinity
-            if(this.detectProximity(boid)) this.flock(boid);
-           default:
-         }
+     this.acquireFriends(boids);
+     this.friends.forEach((boid) => {
+       if(this.detectCollision(boid)) this.steerClear(boid);
+       switch (this.settings.mode) {
+         case "flock":
+          //Intercept boids in the vicinity
+          if(this.detectProximity(boid)) this.flock(boid);
+         default:
        }
      });
    }
+ }
+ acquireFriends(boids){
+   this.friends = [];
+   boids.forEach((boid) => {
+     if(this.id!=boid.id){
+      if(this.detectDistance(boid, this.settings.boidSize*12)){ this.friends.push(boid);}
+     }
+   });
  }
  distanceToBoid(boid){
    let d = Math.sqrt((this.x-boid.x)*(this.x-boid.x)+(this.y-boid.y)*(this.y-boid.y));
@@ -109,6 +133,12 @@ export default class boid {
    return boid.y-this.y;
  }
  toString(){
-   return ("Boid#"+this.id+"\nx: "+this.x+"\ny: "+this.y+"\nvx: "+this.vx+"\nvy: "+this.vy);
+   return ("Boid#"+this.id+"\nx: "+this.x+"\ny: "+this.y+"\nvx: "+this.vx+"\nvy: "+this.vy+"\nphi: "+this.phi);
+ }
+ selectBoid() {
+   this.selected = !this.selected;
+ }
+ hoverBoid() {
+  this.style.filter = "brightness(0.5)";
  }
 }

@@ -16,14 +16,14 @@ let componentMap = [
   {id:"dragme",event:"mousedown",f:grabPanel},
   {id:"dragme",event:"mouseenter",f:hoverPanel},
   {id:"dragme",event:"mouseleave",f:dropPanel},
-  {id:"edgeWidth",event:"focusout",f:updateSettingsFromInput},
-  {id:"speedModifier",event:"focusout",f:updateSettingsFromInput},
-  {id:"boidSize",event:"focusout",f:updateSettingsFromInput},
-  {id:"switchMode",event:"focusout",f:updateSettingsFromInput},
+  {id:"edgeWidth",event:"change",f:updateSettingsFromInput},
+  {id:"speedModifier",event:"change",f:updateSettingsFromInput},
+  {id:"boidSize",event:"change",f:updateSettingsFromInput},
+  {id:"switchMode",event:"change",f:updateSettingsFromInput}
 ];
 componentMap.forEach((item) => {
-  const btn = document.getElementById(item.id);
-  btn.addEventListener(item.event,item.f);
+    const comp = document.getElementById(item.id);
+    comp.addEventListener(item.event,item.f);
 });
 function drag_start(event) {
     var style = window.getComputedStyle(event.target, null);
@@ -57,11 +57,14 @@ function grabPanel() {
 }
 
 function updateSettingsFromInput() {
-  settings.updateSettingsFromInput();
+  settings.setSpeedModifier(document.getElementById("speedModifier").value);
+  settings.setEdgeWidth(document.getElementById("edgeWidth").value);
+  settings.setBoidSize(document.getElementById("boidSize").value);
+  settings.setMode(document.getElementById("switchMode").value);
 }
 
-function addBoid(x,y,vx,vy,color,size) {
-  let b = new boid(x,y,vx,vy,color,size,t);
+function addBoid() {
+  let b = new boid(settings);
   b.renderBoid(settings, boids, t);
 //  b.setMotion();
   boids.push(b);

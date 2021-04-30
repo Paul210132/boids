@@ -2,6 +2,7 @@
   position: absolute;
   border-style: solid;
   border-width: thick;
+  text-align: center;
 }
 .row {
   border-style: double;

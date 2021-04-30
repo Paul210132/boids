@@ -7,12 +7,7 @@ export default class settings {
     this.play = play ? play : true;
     this.night = night ? night : false;
     this.interval  = interval ? interval : 100;
-  }
-  updateSettingsFromInput() {
-    this.setSpeedModifier(document.getElementById("speedModifier").value);
-    this.setEdgeWidth(document.getElementById("edgeWidth").value);
-    this.setBoidSize(document.getElementById("boidSize").value);
-    this.setMode(document.getElementById("switchMode").value);
+    this.currentId = 1;
   }
   setSpeedModifier(speedModifier) {
       this.speedModifier = speedModifier || this.speedModifier;
@@ -31,5 +26,8 @@ export default class settings {
   }
   toggleNight(){
       this.night = !this.night;
+  }
+  generateId(){
+    return this.currentId++;
   }
 }
