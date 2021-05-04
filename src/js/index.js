@@ -1,16 +1,20 @@
 import boid from './boid.js';
 import generateRandomBG from './painter.js';
 import _settings from './settings.js';
+import shape from './shape.js';
 
 let settings = new _settings();
 let boids = [];
 let cont = document.getElementById("container");
 cont.style.width = innerWidth;
 cont.style.height = innerHeight;
+let obstacles = [];
+let canvas = generateCanvas();
+updateSettingsFromInput();
 generateRandomBG(settings.night);
 let componentMap = [
   {id:"clickToAddBoid",event:"click",f:clickToAddBoid},
-  {id:"clearBoids",event:"click",f:clearBoids},
+  {id:"clear",event:"click",f:clear},
   {id:"togglePlay",event:"click",f:togglePlay},
   {id:"toggleNight",event:"click",f:toggleNight},
   {id:"dragme",event:"mousedown",f:grabPanel},
@@ -61,13 +65,41 @@ function updateSettingsFromInput() {
   settings.setEdgeWidth(document.getElementById("edgeWidth").value);
   settings.setBoidSize(document.getElementById("boidSize").value);
   settings.setMode(document.getElementById("switchMode").value);
+  settings.canvas = canvas;
+  updateScene();
 }
+function generateCanvas() {
+  let canvas_ = document.createElement("CANVAS");
+  document.body.appendChild(canvas_);
+  canvas_.width = window.innerWidth*.99;
+  canvas_.height = window.innerHeight*.99;
+  return canvas_;
+}
+function updateScene() {
+  clearCanvas();
 
+  let edge = settings.edgeWidth;
+  let shapes = [];
+  let topLeft = {x:edge,y:edge};
+  let topRight = {x:window.innerWidth-3*edge,y:edge};
+  let bottomLeft = {x:edge,y:window.innerHeight-3*edge};
+  let bottomRight = {x:window.innerWidth-3*edge,y:window.innerHeight-3*edge};
+  shapes.push(new shape(settings,"topWall","line",{x0:topLeft.x,y0:topLeft.y,x1:topRight.x,y1:topRight.y},"black"));
+  shapes.push(new shape(settings,"leftWall","line",{x0:topLeft.x,y0:topLeft.y,x1:bottomLeft.x,y1:bottomLeft.y},"black"));
+  shapes.push(new shape(settings,"bottomWall","line",{x0:bottomLeft.x,y0:bottomLeft.y,x1:bottomRight.x,y1:bottomRight.y},"black"));
+  shapes.push(new shape(settings,"rightWall","line",{x0:topRight.x,y0:topRight.y,x1:bottomRight.x,y1:bottomRight.y},"black"));
+  //shapes.push(new shape(settings,"grid","grid",{step:10},"#ddd"));
+  for(let shape of shapes) { shape.draw(canvas)}
+}
 function addBoid() {
   let b = new boid(settings);
   b.renderBoid(settings, boids, t);
 //  b.setMotion();
   boids.push(b);
+}
+function clear() {
+    clearBoids();
+    updateScene();
 }
 function clearBoids() {
   boids=[];
@@ -75,6 +107,9 @@ function clearBoids() {
   while (elts[0]) {
       document.body.removeChild(elts[0]);
   }
+}
+function clearCanvas() {
+  canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
 }
 function logBoidSpeed(){
   let maxSpeed = [0,0];
@@ -98,6 +133,7 @@ function timer() {
     t++;
     //updateSettings();
     //if(t%2000) logBoidSpeed();
+    updateScene();
     boids.map(boid => boid.renderBoid(settings, boids, t));
   }
 }

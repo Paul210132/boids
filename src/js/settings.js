@@ -1,5 +1,5 @@
 export default class settings {
-  constructor(edgeWidth, speedModifier, boidSize, mode, play, night, interval){
+  constructor(edgeWidth, speedModifier, boidSize, mode, play, night, interval, canvas){
     this.edgeWidth = edgeWidth ? edgeWidth : 10;
     this.speedModifier = speedModifier ? speedModifier : .050;
     this.boidSize = boidSize ? boidSize : 10;
@@ -10,13 +10,13 @@ export default class settings {
     this.currentId = 1;
   }
   setSpeedModifier(speedModifier) {
-      this.speedModifier = speedModifier || this.speedModifier;
+      this.speedModifier = parseFloat(speedModifier) || this.speedModifier;
   }
   setEdgeWidth(edgeWidth) {
-      this.edgeWidth = edgeWidth || this.edgeWidth;
+      this.edgeWidth = parseFloat(edgeWidth) || this.edgeWidth;
   }
   setBoidSize(boidSize) {
-      this.boidSize = boidSize || this.boidSize;
+      this.boidSize = parseFloat(boidSize) || this.boidSize;
   }
   setMode(mode) {
       this.mode = mode || this.mode;;

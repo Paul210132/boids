@@ -4,6 +4,9 @@
   border-width: thick;
   text-align: center;
 }
+canvas{
+  position: absolute;
+}
 .row {
   border-style: double;
   border-width: 5px;
@@ -16,8 +19,8 @@
   cursor: grab;
 }
 #dragme{
-  left: 0;
-  top: 0;
+  left: 35%;
+  top: 78%;
   background-color: gray;
   border-radius: 15px;
   border-style: solid;
