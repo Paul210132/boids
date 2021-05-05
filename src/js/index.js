@@ -23,7 +23,8 @@ let componentMap = [
   {id:"edgeWidth",event:"change",f:updateSettingsFromInput},
   {id:"speedModifier",event:"change",f:updateSettingsFromInput},
   {id:"boidSize",event:"change",f:updateSettingsFromInput},
-  {id:"switchMode",event:"change",f:updateSettingsFromInput}
+  {id:"switchMode",event:"change",f:updateSettingsFromInput},
+  {id:"oscillation",event:"change",f:updateSettingsFromInput}
 ];
 componentMap.forEach((item) => {
     const comp = document.getElementById(item.id);
@@ -65,6 +66,7 @@ function updateSettingsFromInput() {
   settings.setEdgeWidth(document.getElementById("edgeWidth").value);
   settings.setBoidSize(document.getElementById("boidSize").value);
   settings.setMode(document.getElementById("switchMode").value);
+  settings.setOscillation(document.getElementById("oscillation").checked);
   settings.canvas = canvas;
   updateScene();
 }
@@ -94,7 +96,7 @@ function updateScene() {
 function addBoid() {
   let b = new boid(settings);
   b.renderBoid(settings, boids, t);
-//  b.setMotion();
+
   boids.push(b);
 }
 function clear() {
@@ -131,8 +133,7 @@ let timeLoop = setInterval(timer, settings.interval);
 function timer() {
   if(settings.play){
     t++;
-    //updateSettings();
-    //if(t%2000) logBoidSpeed();
+
     updateScene();
     boids.map(boid => boid.renderBoid(settings, boids, t));
   }

@@ -27,17 +27,8 @@ export default class boid {
   createBoidShape(){
     this.color = generateRandomBGColor(this.color,false,0,false);
     this.boidShape = new shape(this.settings,"this guy","boid",{x:this.x,y:this.y,phi:this.phi},this.color);
-    // document.body.appendChild(this.boidElement);
-    // this.boidElement.innerHTML = "<b>"+this.id+"</b>";
-    // this.boidElement.addEventListener("click",this.selectBoid.bind(this));
-    // this.boidElement.id = this.id;
-    // this.boidElement.className = "boid";
   }
   updateGraphicalProperties(canvas){
-    // this.updateColor();
-    // this.updateSize();
-    // let updatedPosition = "translate("+this.x+"px,"+(window.innerHeight-this.y)+"px) rotate("+this.phi+"deg)";
-    // this.boidElement.style.transform = updatedPosition;
     this.boidShape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
     this.boidShape.draw(canvas)
   }
@@ -104,10 +95,9 @@ initGeometricalProperties(){
   this.y = (Math.random()*(window.innerHeight-margin)+margin)*.90;
   this.phi = 180*(2*Math.random()-1);
   this.updateSpeedVector();
-  // let phi = Math.atan(vx/vy)*180/Math.PI;
-  // this.phi = (phi + this.alpha(vx,vy))%360;
 }
 incrementPosition(t){
+  if(this.settings.oscillation) this.phi += 5*Math.sin(t*this.settings.speedModifier%2*Math.PI);
   let phiRad = Math.PI/180*this.phi;
   this.x+= this.r*Math.sin(phiRad)*t;
   this.y+= this.r*Math.cos(phiRad)*t;

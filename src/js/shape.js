@@ -67,17 +67,16 @@ export default class shape{
     ctx.lineTo(x0,y0);
     ctx.stroke();
     ctx.fillStyle = this.color;
-    //ctx.rotate(phi*Math.PI / 180);
     ctx.fill();
   }
-  boid2DPath(s){
-    let path = new Path2D();
-    let x1=(-s/2), y1=(s), y2=(s/2), x3=(s/2);
-    path.lineTo(x1,y1);
-    path.arcTo(0,y2,x3,y1,s*.69); //nice
-    path.lineTo(0,0);
-    return path;
-  }
+  // boid2DPath(s){
+  //   let path = new Path2D();
+  //   let x1=(-s/2), y1=(s), y2=(s/2), x3=(s/2);
+  //   path.lineTo(x1,y1);
+  //   path.arcTo(0,y2,x3,y1,s*.69); //nice
+  //   path.lineTo(0,0);
+  //   return path;
+  // }
   rotate(vector,origin, phi){
   	return {
     x: vector.x*Math.cos(phi*Math.PI/180)-vector.y*Math.sin(phi*Math.PI/180)+origin.x,
