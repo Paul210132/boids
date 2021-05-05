@@ -1,5 +1,3 @@
-import settings from './settings.js'
-
 export default class shape{
 
   constructor(settings,name,type,coord,color){

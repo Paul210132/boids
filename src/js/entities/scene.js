@@ -48,6 +48,7 @@ export default class scene {
     for(let boid of this.boids) {
       boid.updateBoid(t);
     }
+    this.updateObstacles();
     for (let shape of this.shapes) {
       shape.draw(this.canvas);
     }

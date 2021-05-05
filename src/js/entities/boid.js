@@ -1,4 +1,4 @@
-import {generateRandomBGColor} from './painter.js';
+import {generateRandomBGColor} from '../graphical/painter.js';
 import _settings from './settings.js';
 import shape from './shape.js';
 

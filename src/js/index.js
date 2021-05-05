@@ -1,8 +1,7 @@
-import mapPanelControls from './settingsPanelUI.js';
-import generateRandomBG from './painter.js';
-import boid from './boid.js';
+import mapPanelControls from './graphical/settingsPanelUI.js';
+import generateRandomBG from './graphical/painter.js';
 import _settings from './settings.js';
-import _scene from './scene.js';
+import _scene from './entities/scene.js';
 
 let settings = new _settings();
 let boids = [];
