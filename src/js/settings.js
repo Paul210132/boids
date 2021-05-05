@@ -1,5 +1,5 @@
 export default class settings {
-  constructor(edgeWidth, speedModifier, boidSize, mode, play, night, interval, canvas, oscillation){
+  constructor(edgeWidth, speedModifier, boidSize, mode, play, night, interval, oscillation){
     this.edgeWidth = edgeWidth ? edgeWidth : 10;
     this.speedModifier = speedModifier ? speedModifier : .050;
     this.boidSize = boidSize ? boidSize : 10;

@@ -3,46 +3,30 @@ import _settings from './settings.js';
 import shape from './shape.js';
 
 export default class boid {
-  constructor(settings) {
-    this.settings = settings || new _settings();
+  constructor(scene) {
+    this.scene = scene
+    //this.settings = settings || new _settings();
     this.selected = true;
-    this.id = this.settings.generateId();
+    this.id = this.scene.settings.generateId();
     this.friends = [];
     this.initGeometricalProperties();
-    this.createBoidShape();
+    this.createShape();
     this.updateSpeedVector();
-    this.updateGraphicalProperties(settings.canvas);
+    this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
   }
 
   // ---------------- UI ---------------- //
-  renderBoid(settings, boids, t){
-   this.settings = settings;
-   this.updateGraphicalProperties(settings.canvas);
-   this.applyBehavior(boids);
-   this.bounceOffEdge();
-   this.updateSpeedVector();
-   this.incrementPosition(t);
-   this.logger(this.toString());
+  updateBoid(t){
+    this.applyBehavior(boids);
+    this.bounceOffEdge();
+    this.updateSpeedVector();
+    this.incrementPosition(t);
+    this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
+    this.logger(this.toString());
   }
-  createBoidShape(){
+  createShape(){
     this.color = generateRandomBGColor(this.color,false,0,false);
-    this.boidShape = new shape(this.settings,"this guy","boid",{x:this.x,y:this.y,phi:this.phi},this.color);
-  }
-  updateGraphicalProperties(canvas){
-    this.boidShape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
-    this.boidShape.draw(canvas)
-  }
-  updateSize(){
-    let s = this.settings.boidSize;
-    this.boidElement.style.height = 5*s+"px";
-    this.boidElement.style.width = 5*s+"px";
-    this.boidElement.style.borderRadius = 4*s+"px";
-  }
-  updateColor(){
-
-    this.boidElement.style.background = this.color;
-    let borderColor = this.selected ? "darkred":"black";
-    this.boidElement.style.borderColor = borderColor;
+    this.shape = new shape(this.scene.settings,"this guy","boid",{x:this.x,y:this.y,phi:this.phi},this.color);
   }
 
  // ---------------- Behavior ---------------- //
@@ -76,10 +60,10 @@ export default class boid {
    return (this.distanceToBoid(boid) < distance);
  }
  detectProximity(boid){
-   return this.detectDistance(boid, this.settings.boidSize*12);
+   return this.detectDistance(boid, this.scene.settings.boidSize*12);
  }
  detectCollision(boid){
-   let collision = this.detectDistance(boid, this.settings.boidSize*5);
+   let collision = this.detectDistance(boid, this.scene.settings.boidSize*5);
    return collision;
  }
  distanceToBoid(boid){
@@ -90,14 +74,14 @@ export default class boid {
 
 // ---------------- Position - Modify ---------------- //
 initGeometricalProperties(){
-  let margin = this.settings.edgeWidth*4+this.settings.boidSize
+  let margin = this.scene.settings.edgeWidth*4+this.scene.settings.boidSize
   this.x = (Math.random()*(window.innerWidth-margin)+margin)*.90;
   this.y = (Math.random()*(window.innerHeight-margin)+margin)*.90;
   this.phi = 180*(2*Math.random()-1);
   this.updateSpeedVector();
 }
 incrementPosition(t){
-  if(this.settings.oscillation) this.phi += 5*Math.sin(t*this.settings.speedModifier%2*Math.PI);
+  if(this.scene.settings.oscillation) this.phi += 5*Math.sin(4*t*this.scene.settings.speedModifier%2*Math.PI);
   let phiRad = Math.PI/180*this.phi;
   this.x+= this.r*Math.sin(phiRad)*t;
   this.y+= this.r*Math.cos(phiRad)*t;
@@ -107,14 +91,14 @@ incrementPosition(t){
 updateSpeedVector(){
   this.vx = this.r*Math.sin(this.phi);
   this.vy = this.r*Math.cos(this.phi)
-  this.r = this.settings.speedModifier;
+  this.r = this.scene.settings.speedModifier;
 }
  bounceOffEdge(){
    //bounce off the edge
    let bounceLeft = this.x > .96*(window.innerWidth - this.settings.edgeWidth);
-   let bounceRight = this.x < this.settings.edgeWidth;
+   let bounceRight = this.x < this.scene.settings.edgeWidth;
    let bounceUp = this.y > .93*(window.innerHeight - this.settings.edgeWidth);
-   let bounceDown = this.y < this.settings.edgeWidth;
+   let bounceDown = this.y < this.scene.settings.edgeWidth;
    if(bounceLeft || bounceRight){
      //right/left edge
      this.phi = -this.phi;
