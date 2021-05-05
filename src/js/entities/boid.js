@@ -6,21 +6,20 @@ export default class boid {
   constructor(scene) {
     this.scene = scene
     //this.scene.settings = settings || new _settings();
-    this.selected = true;
+    this.selected = false;
     this.id = this.scene.settings.generateId();
     this.friends = [];
     this.initGeometricalProperties();
     this.createShape();
-    this.updateSpeedVector();
     this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
   }
 
   // ---------------- UI ---------------- //
-  updateBoid(t){
-    this.applyBehavior(this.scene.boids);
+  updateBoid(){
+    this.applyBehavior();
     this.bounceOffEdge();
     this.updateSpeedVector();
-    this.incrementPosition(t);
+    this.incrementPosition();
     this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
     this.logger(this.toString());
   }
@@ -30,11 +29,11 @@ export default class boid {
   }
 
  // ---------------- Behavior ---------------- //
-  applyBehavior(boids){
+  applyBehavior(){
     if(this.scene.settings.mode == "gravity"){
       this.vy += .1 * this.scene.settings.speedModifier;
     } else {
-      this.acquireFriends(boids);
+      this.acquireFriends();
       this.friends.forEach((boid) => {
         if(this.detectCollision(boid)) this.steerClear(boid);
         switch (this.scene.settings.mode) {
@@ -46,9 +45,9 @@ export default class boid {
       });
     }
   }
-  acquireFriends(boids){
+  acquireFriends(){
     this.friends = [];
-    boids.forEach((boid) => {
+    this.scene.boids.forEach((boid) => {
       if(this.id!=boid.id){
        if(this.detectDistance(boid, this.scene.settings.boidSize*12)){ this.friends.push(boid);}
       }
@@ -74,22 +73,22 @@ export default class boid {
 
 // ---------------- Position - Modify ---------------- //
 initGeometricalProperties(){
-  let margin = this.scene.settings.edgeWidth*4+this.scene.settings.boidSize
-  this.x = (Math.random()*(window.innerWidth-margin)+margin)*.90;
-  this.y = (Math.random()*(window.innerHeight-margin)+margin)*.90;
+  //let margin = this.scene.settings.edgeWidth*4+this.scene.settings.boidSize
+  this.x = (Math.random()*(this.scene.xmax-this.scene.xmin)+this.scene.xmin)*.90;
+  this.y = (Math.random()*(this.scene.ymax-this.scene.ymin)+this.scene.ymin)*.90;
   this.phi = 180*(2*Math.random()-1);
   this.updateSpeedVector();
 }
-incrementPosition(t){
-  if(this.scene.settings.oscillation) this.phi += 5*Math.sin(4*t*this.scene.settings.speedModifier%2*Math.PI);
+incrementPosition(){
+  if(this.scene.settings.oscillation) this.phi += 5*Math.sin(4*this.x*this.scene.settings.speedModifier/*%2*Math.PI*/);
   let phiRad = Math.PI/180*this.phi;
-  this.x+= this.r*Math.sin(phiRad)*t;
-  this.y+= this.r*Math.cos(phiRad)*t;
+  this.x+= this.r*Math.cos(phiRad);
+  this.y+= this.r*Math.sin(phiRad);
 }
 
 // ---------------- Speed - Modify ---------------- //
 updateSpeedVector(){
-  this.vx = this.r*Math.sin(this.phi);
+  this.vx = -this.r*Math.sin(this.phi);
   this.vy = this.r*Math.cos(this.phi)
   this.r = this.scene.settings.speedModifier;
 }

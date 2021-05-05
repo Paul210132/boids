@@ -19,20 +19,21 @@ export default class scene {
 
   generateObstacles() {
     let edge = this.settings.edgeWidth;
-    let topLeft = {x:edge,y:edge};
-    let topRight = {x:window.innerWidth-3*edge,y:edge};
-    let bottomLeft = {x:edge,y:window.innerHeight-3*edge};
-    let bottomRight = {x:window.innerWidth-3*edge,y:window.innerHeight-3*edge};
-    this.shapes.push(new shape(this.settings,"topWall","line",{x0:topLeft.x,y0:topLeft.y,x1:topRight.x,y1:topRight.y},"black"));
-    this.shapes.push(new shape(this.settings,"leftWall","line",{x0:topLeft.x,y0:topLeft.y,x1:bottomLeft.x,y1:bottomLeft.y},"black"));
-    this.shapes.push(new shape(this.settings,"bottomWall","line",{x0:bottomLeft.x,y0:bottomLeft.y,x1:bottomRight.x,y1:bottomRight.y},"black"));
-    this.shapes.push(new shape(this.settings,"rightWall","line",{x0:topRight.x,y0:topRight.y,x1:bottomRight.x,y1:bottomRight.y},"black"));
+    let border = this.settings.night ? "white" : "black";
+    this.xmin = edge;
+    this.ymin = edge;
+    this.xmax = window.innerWidth-3*edge;
+    this.ymax = window.innerHeight-3*edge;
+    this.shapes.push(new shape(this.settings,"topWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmax,y1:this.ymin},border));
+    this.shapes.push(new shape(this.settings,"leftWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmin,y1:this.ymax},border));
+    this.shapes.push(new shape(this.settings,"bottomWall","line",{x0:this.xmin,y0:this.ymax,x1:this.xmax,y1:this.ymax},border));
+    this.shapes.push(new shape(this.settings,"rightWall","line",{x0:this.xmax,y0:this.ymax,x1:this.xmax,y1:this.ymin},border));
     //shapes.push(new shape(settings,"grid","grid",{step:10},"#ddd"));
   }
 
-  addBoid(t){
+  addBoid(){
     let b = new boid(this);
-    b.updateBoid(t);
+    b.updateBoid();
     this.boids.push(b);
   }
 
@@ -41,11 +42,11 @@ export default class scene {
     this.shapes = [];
   }
 
-  render(t){
+  render(){
     this.clearCanvas();
     this.generateObstacles();
     for(let boid of this.boids) {
-      boid.updateBoid(t);
+      boid.updateBoid();
       this.shapes.push(boid.shape);
     }
     for (let shape of this.shapes) {

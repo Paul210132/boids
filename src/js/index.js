@@ -3,7 +3,7 @@ import generateRandomBG from './graphical/painter.js';
 import _settings from './settings.js';
 import _scene from './entities/scene.js';
 
-let settings = new _settings();
+let settings = new _settings({});
 let boids = [];
 let scene = new _scene(settings);
 let cont = document.getElementById("container");
@@ -43,20 +43,17 @@ function updateSettingsFromInput() {
 }
 
 function clickToAddBoid() {
-  scene.addBoid(t);
+  scene.addBoid();
 }
 function clear() {
   scene.boids=[];
 }
 
 // Time Management
-let t = 0;
 let timeLoop = setInterval(timer, settings.interval);
 function timer() { //TODO: migrate https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
   if(settings.play){
-    t++;
-    scene.render(t);
-    //boids.map(boid => boid.renderBoid(settings, boids, t));
+    scene.render();
   }
 }
 function togglePlay() {

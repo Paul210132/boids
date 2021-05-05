@@ -44,10 +44,11 @@ export default class shape{
     ctx.beginPath();
     ctx.moveTo(x0,y0);
     ctx.lineTo(x1,y1);
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = this.color;
     ctx.stroke();
   }
-  drawBoid(x0,y0,phi,canvas){
+  drawBoid(x0,y0,phi_,canvas){
+    let phi = phi_+90;
     let s = this.settings.boidSize;
     let ctx = canvas.getContext("2d");
     ctx.beginPath();

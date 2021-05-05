@@ -1,13 +1,13 @@
 export default class settings {
-  constructor(edgeWidth, speedModifier, boidSize, mode, play, night, interval, oscillation){
-    this.edgeWidth = edgeWidth ? edgeWidth : 10;
-    this.speedModifier = speedModifier ? speedModifier : .050;
-    this.boidSize = boidSize ? boidSize : 10;
-    this.mode = mode ? mode : "random";
-    this.play = play ? play : true;
-    this.night = night ? night : false;
-    this.interval  = interval ? interval : 100;
-    this.oscillation  = oscillation ? oscillation : false;
+  constructor(params){
+    this.edgeWidth = params.edgeWidth ? params.edgeWidth : 10;
+    this.speedModifier = params.speedModifier ? params.speedModifier : .050;
+    this.boidSize = params.boidSize ? params.boidSize : 10;
+    this.mode = params.mode ? params.mode : "random";
+    this.play = params.play ? params.play : true;
+    this.night = params.night ? params.night : true;
+    this.interval  = params.interval ? params.interval : 100;
+    this.oscillation  = params.oscillation ? params.oscillation : false;
     this.currentId = 1;
   }
   setSpeedModifier(speedModifier) {
