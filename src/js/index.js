@@ -40,7 +40,6 @@ function updateSettingsFromInput() {
   settings.setBoidSize(document.getElementById("boidSize").value);
   settings.setMode(document.getElementById("switchMode").value);
   settings.setOscillation(document.getElementById("oscillation").checked);
-  scene.update();
 }
 
 function clickToAddBoid() {
@@ -48,7 +47,6 @@ function clickToAddBoid() {
 }
 function clear() {
   scene.boids=[];
-  scene.update();
 }
 
 // Time Management

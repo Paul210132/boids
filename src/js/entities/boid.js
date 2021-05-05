@@ -1,11 +1,11 @@
 import {generateRandomBGColor} from '../graphical/painter.js';
-import _settings from './settings.js';
+//import _settings from '../settings.js';
 import shape from './shape.js';
 
 export default class boid {
   constructor(scene) {
     this.scene = scene
-    //this.settings = settings || new _settings();
+    //this.scene.settings = settings || new _settings();
     this.selected = true;
     this.id = this.scene.settings.generateId();
     this.friends = [];
@@ -17,7 +17,7 @@ export default class boid {
 
   // ---------------- UI ---------------- //
   updateBoid(t){
-    this.applyBehavior(boids);
+    this.applyBehavior(this.scene.boids);
     this.bounceOffEdge();
     this.updateSpeedVector();
     this.incrementPosition(t);
@@ -31,13 +31,13 @@ export default class boid {
 
  // ---------------- Behavior ---------------- //
   applyBehavior(boids){
-    if(this.settings.mode == "gravity"){
-      this.vy += .1 * this.settings.speedModifier;
+    if(this.scene.settings.mode == "gravity"){
+      this.vy += .1 * this.scene.settings.speedModifier;
     } else {
       this.acquireFriends(boids);
       this.friends.forEach((boid) => {
         if(this.detectCollision(boid)) this.steerClear(boid);
-        switch (this.settings.mode) {
+        switch (this.scene.settings.mode) {
           case "flock":
            //Intercept boids in the vicinity
            if(this.detectProximity(boid)) this.flock(boid);
@@ -50,7 +50,7 @@ export default class boid {
     this.friends = [];
     boids.forEach((boid) => {
       if(this.id!=boid.id){
-       if(this.detectDistance(boid, this.settings.boidSize*12)){ this.friends.push(boid);}
+       if(this.detectDistance(boid, this.scene.settings.boidSize*12)){ this.friends.push(boid);}
       }
     });
   }
@@ -95,9 +95,9 @@ updateSpeedVector(){
 }
  bounceOffEdge(){
    //bounce off the edge
-   let bounceLeft = this.x > .96*(window.innerWidth - this.settings.edgeWidth);
+   let bounceLeft = this.x > .96*(window.innerWidth - this.scene.settings.edgeWidth);
    let bounceRight = this.x < this.scene.settings.edgeWidth;
-   let bounceUp = this.y > .93*(window.innerHeight - this.settings.edgeWidth);
+   let bounceUp = this.y > .93*(window.innerHeight - this.scene.settings.edgeWidth);
    let bounceDown = this.y < this.scene.settings.edgeWidth;
    if(bounceLeft || bounceRight){
      //right/left edge

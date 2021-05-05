@@ -1,4 +1,5 @@
 import shape from './shape.js';
+import boid from './boid.js';
 
 export default class scene {
   constructor(settings){
@@ -15,13 +16,8 @@ export default class scene {
     canvas_.height = window.innerHeight*.99;
     return canvas_;
   }
-  update(t) {
-    this.clearCanvas();
 
-    for(let shape of this.shapes) { shape.draw(this.canvas)}
-  }
-
-  updateObstacles() {
+  generateObstacles() {
     let edge = this.settings.edgeWidth;
     let topLeft = {x:edge,y:edge};
     let topRight = {x:window.innerWidth-3*edge,y:edge};
@@ -37,18 +33,21 @@ export default class scene {
   addBoid(t){
     let b = new boid(this);
     b.updateBoid(t);
-    boids.push(b);
+    this.boids.push(b);
   }
 
   clearCanvas() {
     this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
+    this.shapes = [];
   }
 
   render(t){
+    this.clearCanvas();
+    this.generateObstacles();
     for(let boid of this.boids) {
       boid.updateBoid(t);
+      this.shapes.push(boid.shape);
     }
-    this.updateObstacles();
     for (let shape of this.shapes) {
       shape.draw(this.canvas);
     }
