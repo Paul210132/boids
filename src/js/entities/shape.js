@@ -4,7 +4,8 @@ export default class shape{
     this.settings = settings;
     this.name = name;
     this.type = type;
-    this.color = color;
+    this.color = color || "black";
+    this.border = this.settings.night ? "white" : "black";
     this.updateCoordinates(coord);
   }
   updateCoordinates(coord){
@@ -44,7 +45,7 @@ export default class shape{
     ctx.beginPath();
     ctx.moveTo(x0,y0);
     ctx.lineTo(x1,y1);
-    ctx.strokeStyle = this.color;
+    ctx.strokeStyle = this.border;
     ctx.stroke();
   }
   drawBoid(x0,y0,phi_,canvas){
@@ -58,7 +59,7 @@ export default class shape{
     let C = this.rotate({x:0,y:y2},{x:x0,y:y0},phi);
     let D = this.rotate({x:x3,y:y1},{x:x0,y:y0},phi);
     ctx.moveTo(x0,y0);
-
+    ctx.strokeStyle = this.border;
     ctx.lineTo(B.x,B.y);
     ctx.stroke();
     ctx.arcTo(C.x,C.y,D.x,D.y,s*.69); //nice

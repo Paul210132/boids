@@ -59,7 +59,7 @@ export default class boid {
    return (this.distanceToBoid(boid) < distance);
  }
  detectProximity(boid){
-   return this.detectDistance(boid, this.scene.settings.boidSize*12);
+   return this.detectDistance(boid, this.scene.settings.boidSize*2);
  }
  detectCollision(boid){
    let collision = this.detectDistance(boid, this.scene.settings.boidSize*5);

@@ -19,15 +19,14 @@ export default class scene {
 
   generateObstacles() {
     let edge = this.settings.edgeWidth;
-    let border = this.settings.night ? "white" : "black";
     this.xmin = edge;
     this.ymin = edge;
     this.xmax = window.innerWidth-3*edge;
     this.ymax = window.innerHeight-3*edge;
-    this.shapes.push(new shape(this.settings,"topWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmax,y1:this.ymin},border));
-    this.shapes.push(new shape(this.settings,"leftWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmin,y1:this.ymax},border));
-    this.shapes.push(new shape(this.settings,"bottomWall","line",{x0:this.xmin,y0:this.ymax,x1:this.xmax,y1:this.ymax},border));
-    this.shapes.push(new shape(this.settings,"rightWall","line",{x0:this.xmax,y0:this.ymax,x1:this.xmax,y1:this.ymin},border));
+    this.shapes.push(new shape(this.settings,"topWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmax,y1:this.ymin}));
+    this.shapes.push(new shape(this.settings,"leftWall","line",{x0:this.xmin,y0:this.ymin,x1:this.xmin,y1:this.ymax}));
+    this.shapes.push(new shape(this.settings,"bottomWall","line",{x0:this.xmin,y0:this.ymax,x1:this.xmax,y1:this.ymax}));
+    this.shapes.push(new shape(this.settings,"rightWall","line",{x0:this.xmax,y0:this.ymax,x1:this.xmax,y1:this.ymin}));
     //shapes.push(new shape(settings,"grid","grid",{step:10},"#ddd"));
   }
 
