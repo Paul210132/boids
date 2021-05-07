@@ -50,7 +50,9 @@ function clickBackground(ev) {
   }
 }
 function clickToAddBoid() {
-  scene.addBoid();
+  for(let i = 0; i<parseInt(document.getElementById("addQty").value); i++){
+    scene.addBoid();    
+  }
 }
 function clear() {
   scene.boids=[];

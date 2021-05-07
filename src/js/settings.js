@@ -5,8 +5,8 @@ export default class settings {
     this.boidSize = params.boidSize ? params.boidSize : 10;
     this.mode = params.mode ? params.mode : "random";
     this.play = params.play ? params.play : true;
-    this.night = params.night ? params.night : true;
-    this.interval  = params.interval ? params.interval : 100;
+    this.night = params.night ? params.night : false;
+    this.interval  = params.interval ? params.interval : 50;
     this.oscillation  = params.oscillation ? params.oscillation : false;
     this.currentId = 1;
   }
