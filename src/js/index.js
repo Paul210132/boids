@@ -51,7 +51,7 @@ function clickBackground(ev) {
 }
 function clickToAddBoid() {
   for(let i = 0; i<parseInt(document.getElementById("addQty").value); i++){
-    scene.addBoid();    
+    scene.addBoid();
   }
 }
 function clear() {
@@ -59,10 +59,11 @@ function clear() {
 }
 
 // Time Management
-let timeLoop = setInterval(timer, settings.interval);
+window.requestAnimationFrame(timer);
 function timer() { //TODO: migrate https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
   if(settings.play){
     scene.render();
+    window.requestAnimationFrame(timer);
   }
 }
 function togglePlay() {
