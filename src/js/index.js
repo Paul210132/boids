@@ -13,6 +13,7 @@ updateSettingsFromInput();
 generateRandomBG(settings.night);
 mapPanelControls();
 let componentMap = [
+  {id:"canvas",event:"click",f:clickBackground},
   {id:"clickToAddBoid",event:"click",f:clickToAddBoid},
   {id:"clear",event:"click",f:clear},
   {id:"togglePlay",event:"click",f:togglePlay},
@@ -41,7 +42,13 @@ function updateSettingsFromInput() {
   settings.setMode(document.getElementById("switchMode").value);
   settings.setOscillation(document.getElementById("oscillation").checked);
 }
-
+function clickBackground(ev) {
+  for(let boid of scene.boids){
+    if(boid.shape.distanceToPoint(ev.clientX,ev.clientY)<30){
+      boid.selectBoid();
+    }
+  }
+}
 function clickToAddBoid() {
   scene.addBoid();
 }

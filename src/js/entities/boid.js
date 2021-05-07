@@ -4,72 +4,86 @@ import shape from './shape.js';
 
 export default class boid {
   constructor(scene) {
-    this.scene = scene
+    this.scene = scene;
     //this.scene.settings = settings || new _settings();
     this.selected = false;
     this.id = this.scene.settings.generateId();
     this.friends = [];
     this.initGeometricalProperties();
     this.createShape();
-    this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
+    this.updateShape();
+  }
+  defaultParams(){
+    return {
+      name:"this guy",
+      type:"boid",
+      coord:
+        {
+          x:this.x,
+          y:this.y,
+          phi:this.phi
+        },
+        color:this.color,
+        boidId:this.id,
+        selected:this.selected
+      };
   }
 
   // ---------------- UI ---------------- //
   updateBoid(){
-    this.applyBehavior();
-    this.bounceOffEdge();
+    this.solveBehavior();
     this.updateSpeedVector();
     this.incrementPosition();
-    this.shape.updateCoordinates({x:this.x,y:this.y,phi:this.phi});
+    this.updateShape();
     this.logger(this.toString());
   }
   createShape(){
     this.color = generateRandomBGColor(this.color,false,0,false);
-    this.shape = new shape(this.scene.settings,"this guy","boid",{x:this.x,y:this.y,phi:this.phi},this.color);
+    this.shape = new shape(this.scene.settings,this.defaultParams());
+  }
+  updateShape(){
+    this.shape.update(this.defaultParams());
   }
 
  // ---------------- Behavior ---------------- //
-  applyBehavior(){
-    if(this.scene.settings.mode == "gravity"){
-      this.vy += .1 * this.scene.settings.speedModifier;
-    } else {
-      this.acquireFriends();
-      this.friends.forEach((boid) => {
-        if(this.detectCollision(boid)) this.steerClear(boid);
-        switch (this.scene.settings.mode) {
-          case "flock":
-           //Intercept boids in the vicinity
-           if(this.detectProximity(boid)) this.flock(boid);
-          default:
-        }
-      });
+  solveBehavior(){
+    this.lookAround({proximity:4,collision:{boid:1,wall:4}});
+    switch (this.scene.settings.mode) {
+      case "gravity":
+        this.vy += .1 * this.scene.settings.speedModifier;
+      break;
+      case "flock":
+        this.flock();
+      break;
+      default:
     }
   }
-  acquireFriends(){
+  lookAround(range){
     this.friends = [];
-    this.scene.boids.forEach((boid) => {
-      if(this.id!=boid.id){
-       if(this.detectDistance(boid, this.scene.settings.boidSize*12)){ this.friends.push(boid);}
+    let sFactor = this.scene.settings.boidSize;
+    for(let shape of this.scene.shapes) {
+      if(this.id!=shape.boidId){
+        let delta = this.shape.distanceToShape(shape);
+        switch (shape.type) {
+          case "boid":
+            let boid;
+            if(delta.distance < sFactor*range.proximity){ // acquire friends
+              boid = this.scene.boids.find(boid=>boid.id==shape.boidId);
+              this.friends.push(boid);
+            } if(delta.distance < sFactor*range.collision.boid){ // avoid boid collision
+              this.steerClear(boid.phi);
+            }
+            break;
+          case "line":
+            if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
+              this.steerClear(delta.angle);
+            }
+            break;
+          default:
+        }
       }
-    });
+    }
   }
-
- // ---------------- Position - Eval ---------------- //
- detectDistance(boid, distance){
-   return (this.distanceToBoid(boid) < distance);
- }
- detectProximity(boid){
-   return this.detectDistance(boid, this.scene.settings.boidSize*2);
- }
- detectCollision(boid){
-   let collision = this.detectDistance(boid, this.scene.settings.boidSize*5);
-   return collision;
- }
- distanceToBoid(boid){
-   let d = Math.sqrt((this.x-boid.x)*(this.x-boid.x)+(this.y-boid.y)*(this.y-boid.y));
-   //console.log("dist #"+this.id+" to #"+boid.id+" : "+d);
-   return d;
- }
 
 // ---------------- Position - Modify ---------------- //
 initGeometricalProperties(){
@@ -92,37 +106,16 @@ updateSpeedVector(){
   this.vy = this.r*Math.cos(this.phi)
   this.r = this.scene.settings.speedModifier;
 }
- bounceOffEdge(){
-   //bounce off the edge
-   let bounceLeft = this.x > .96*(window.innerWidth - this.scene.settings.edgeWidth);
-   let bounceRight = this.x < this.scene.settings.edgeWidth;
-   let bounceUp = this.y > .93*(window.innerHeight - this.scene.settings.edgeWidth);
-   let bounceDown = this.y < this.scene.settings.edgeWidth;
-   if(bounceLeft || bounceRight){
-     //right/left edge
-     this.phi = -this.phi;
-     this.logger("bounce : x="+this.x+" edge="+window.innerWidth);
-   }if(bounceUp || bounceDown){
-     //top/btm edge
-     let alpha = this.alpha(Math.sin(this.phi),Math.cos(this.phi));
-     this.phi += alpha;
-     this.logger("bounce : y="+this.y+" edge="+window.innerHeight);
-   }
- }
- flock(boid){
-   let sum = 0;
+ flock(){
+   let sum = this.phi;
    for(let boid of this.friends){
      sum+=boid.phi;
    }
-   this.phi = sum/this.friends.length;
-   // this.vx = (.7*this.vx+.3*boid.vx/*+this.dx(boid)*/);
-   // this.vy = (.7*this.vy+.3*boid.vy/*+this.dy(boid)*/);
+   this.phi = sum/(this.friends.length+1);
  }
- steerClear(boid){
-   let ran = 2*Math.random()-1;
-   this.phi += ran/Math.abs(ran)*5;
-   // this.vx = -this.vx;// this.dx(boid)/2;
-   // this.vy = -this.vy;// this.dy(boid)/2;
+ steerClear(phi){
+   let delta = this.phi-phi;
+   if(delta!=0) this.phi += delta/Math.abs(delta)*5;
  }
  // ---------------- Speed - Eval ---------------- //
  alpha(x,y){

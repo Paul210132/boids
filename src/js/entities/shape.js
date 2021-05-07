@@ -1,16 +1,23 @@
 export default class shape{
 
-  constructor(settings,name,type,coord,color){
+  constructor(settings,params){
     this.settings = settings;
-    this.name = name;
-    this.type = type;
-    this.color = color || "black";
-    this.border = this.settings.night ? "white" : "black";
-    this.updateCoordinates(coord);
+    this.name = params.name || "";
+    this.type = params.type || "";
+    this.color = params.color || "black";
+    this.boidId = params.boidId || undefined;
+    this.update(params);
   }
-  updateCoordinates(coord){
-    this.coord = coord;
+  update(params){
+    this.coord = params.coord;
+    this.selected = params.selected || false;
+    this.border = {
+      color : this.settings.night || this.selected ? "white" : "black",
+      width : this.selected ? "5" : "1.0"
+    };
   }
+
+  // ---------------- Draw ---------------- //
   draw(canvas){
     let c = this.coord;
     switch (this.type) {
@@ -19,10 +26,11 @@ export default class shape{
         break;
       case "boid":
         this.drawBoid(c.x,c.y,c.phi,canvas);
+        break;
       case "grid":
         this.drawGrid(c.step,canvas);
+        break;
       default:
-
     }
   }
   drawGrid(step, canvas){
@@ -45,21 +53,24 @@ export default class shape{
     ctx.beginPath();
     ctx.moveTo(x0,y0);
     ctx.lineTo(x1,y1);
-    ctx.strokeStyle = this.border;
+    ctx.strokeStyle = this.border.color;
+    ctx.lineWidth = this.border.width;
     ctx.stroke();
   }
   drawBoid(x0,y0,phi_,canvas){
     let phi = phi_+90;
-    let s = this.settings.boidSize;
     let ctx = canvas.getContext("2d");
     ctx.beginPath();
+    //let path = this.boid2DPath(x0,y0,phi);
+    let s = this.settings.boidSize;
     let x1=(-s/2), y1=(s), y2=(s/2), x3=(s/2);
     let A = this.rotate({x:0,y:0},{x:x0,y:y0},phi);
     let B = this.rotate({x:x1,y:y1},{x:x0,y:y0},phi);
     let C = this.rotate({x:0,y:y2},{x:x0,y:y0},phi);
     let D = this.rotate({x:x3,y:y1},{x:x0,y:y0},phi);
+    ctx.strokeStyle = this.border.color;
+    ctx.lineWidth = this.border.width;
     ctx.moveTo(x0,y0);
-    ctx.strokeStyle = this.border;
     ctx.lineTo(B.x,B.y);
     ctx.stroke();
     ctx.arcTo(C.x,C.y,D.x,D.y,s*.69); //nice
@@ -69,18 +80,53 @@ export default class shape{
     ctx.fillStyle = this.color;
     ctx.fill();
   }
-  // boid2DPath(s){
-  //   let path = new Path2D();
-  //   let x1=(-s/2), y1=(s), y2=(s/2), x3=(s/2);
-  //   path.lineTo(x1,y1);
-  //   path.arcTo(0,y2,x3,y1,s*.69); //nice
-  //   path.lineTo(0,0);
-  //   return path;
-  // }
+
+  // ---------------- Math ---------------- //
   rotate(vector,origin, phi){
   	return {
     x: vector.x*Math.cos(phi*Math.PI/180)-vector.y*Math.sin(phi*Math.PI/180)+origin.x,
     y: vector.y*Math.cos(phi*Math.PI/180)+vector.x*Math.sin(phi*Math.PI/180)+origin.y
     }
   }
+  distanceToShape(shape){
+    let distance = {distance:0,angle:0};
+    if(this.type!="boid"){
+      console.error("Error evaluating distance between "+this.name+"["+this.type+"] and "+shape.name+"["+shape.type+"].");
+    } else {
+      switch (shape.type) {
+        case "line":
+          distance = this.distanceToLine(shape.coord);
+          break;
+        case "boid":
+          distance = this.distanceToBoid(shape.coord);
+          break;
+        default:
+      }
+    }
+    return distance;
+  }
+  distanceToLine(coord){
+    let delta = {};
+    if(coord.x0==coord.x1){ // Case 1 : line is vertical
+      delta = {
+        distance: Math.abs(this.coord.x-coord.x0),
+        angle:this.coord.phi
+      };
+    } else if (coord.y0==coord.y1) { // Case 2 : line is horizontal
+      delta = {
+        distance: Math.abs(this.coord.y-coord.y0),
+        angle:90-this.coord.phi
+      };
+    } else { // Case 3 : line is skewed
+      /*not implemented yet; math source : https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line*/
+    }
+    return delta;
+  }
+  distanceToBoid(coord){
+    return {distance: this.distanceToPoint(coord.x,coord.y), angle:0};
+  }
+  distanceToPoint(x,y){
+    return Math.sqrt((this.coord.x-x)*(this.coord.x-x)+(this.coord.y-y)*(this.coord.y-y));
+  }
+
 }
