@@ -473,7 +473,6 @@
   }
 
   // Time Management
-  // let timeLoop = setInterval(timer, settings.interval);
   window.requestAnimationFrame(timer);
   function timer() { //TODO: migrate https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
     if(settings.play){
