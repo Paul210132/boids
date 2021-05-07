@@ -79,6 +79,7 @@
       this.night = params.night ? params.night : false;
       this.interval  = params.interval ? params.interval : 50;
       this.oscillation  = params.oscillation ? params.oscillation : false;
+      this.obstacles  = params.obstacles ? params.obstacles : false;
       this.currentId = 1;
     }
     setSpeedModifier(speedModifier) {
@@ -94,6 +95,9 @@
         this.mode = mode || this.mode;  }
     setOscillation(oscillation) {
         this.oscillation = oscillation;
+    }
+    setObstacles(obstacles) {
+        this.obstacles = obstacles;
     }
     togglePlay(){
         this.play = !this.play;
@@ -221,9 +225,16 @@
       } else if (coord.y0==coord.y1) { // Case 2 : line is horizontal
         delta = {
           distance: Math.abs(this.coord.y-coord.y0),
-          angle:90-this.coord.phi
+          angle:this.coord.phi-90
         };
-      } else ;
+      } else { // Case 3 : line is skewed
+        let dx = coord.x1 - coord.x0;
+        let dy = coord.y1 - coord.y0;
+        delta = {
+          distance: Math.abs(dx*(coord.y0-this.coord.y)-dy*(coord.x0-this.coord.x))/Math.sqrt(dx*dx+dy*dy),
+          angle:Math.atan(dy/dx)-thi.coord.phi
+        };
+      }
       return delta;
     }
     distanceToBoid(coord){
@@ -238,7 +249,6 @@
   class boid {
     constructor(scene) {
       this.scene = scene;
-      //this.scene.settings = settings || new _settings();
       this.selected = false;
       this.id = this.scene.settings.generateId();
       this.friends = [];
@@ -303,12 +313,15 @@
                 boid = this.scene.boids.find(boid=>boid.id==shape.boidId);
                 this.friends.push(boid);
               } if(delta.distance < sFactor*range.collision.boid){ // avoid boid collision
-                this.steerClear(boid.phi);
+                this.steer(boid.phi);
               }
               break;
             case "line":
               if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
-                this.steerClear(delta.angle);
+                if(shape.name == "topWall" || shape.name == "bottomWall"){
+                  console.log("yo");
+                }
+                this.steer(delta.angle);
               }
               break;
           }
@@ -344,14 +357,10 @@
      }
      this.phi = sum/(this.friends.length+1);
    }
-   steerClear(phi){
-     let delta = this.phi-phi;
-     if(delta!=0) this.phi += delta/Math.abs(delta)*5;
+   steer(delta){
+     if(delta!=0) this.phi += delta/Math.abs(delta)*5*this.scene.settings.speedModifier;
    }
-   // ---------------- Speed - Eval ---------------- //
-   alpha(x,y){
-     return y < 0 ? x/Math.abs(x)*180 : 0;
-   }
+
    // ---------------- Debug ---------------- //
    logger(string){
      if(this.selected) console.log(string);
@@ -391,6 +400,13 @@
       this.shapes.push(new shape(this.settings,{name:"leftWall",type:"line",coord:{x0:this.xmin,y0:this.ymin,x1:this.xmin,y1:this.ymax}}));
       this.shapes.push(new shape(this.settings,{name:"bottomWall",type:"line",coord:{x0:this.xmin,y0:this.ymax,x1:this.xmax,y1:this.ymax}}));
       this.shapes.push(new shape(this.settings,{name:"rightWall",type:"line",coord:{x0:this.xmax,y0:this.ymax,x1:this.xmax,y1:this.ymin}}));
+      if(this.settings.obstacles){
+        this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*10,y0:(this.ymax-this.ymin)*.4,x1:edge*20,y1:(this.ymax-this.ymin)*.6}}));
+        this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*20,y0:(this.ymax-this.ymin)*.6,x1:edge*30,y1:(this.ymax-this.ymin)*.4}}));
+        this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*30,y0:(this.ymax-this.ymin)*.4,x1:edge*40,y1:(this.ymax-this.ymin)*.6}}));
+        this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*40,y0:(this.ymax-this.ymin)*.6,x1:edge*50,y1:(this.ymax-this.ymin)*.4}}));
+        this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*50,y0:(this.ymax-this.ymin)*.4,x1:this.xmax,y1:this.ymax}}));
+      }
       //shapes.push(new shape(settings,"grid","grid",{step:10},"#ddd"));
     }
 
@@ -436,7 +452,8 @@
     {id:"speedModifier",event:"change",f:updateSettingsFromInput},
     {id:"boidSize",event:"change",f:updateSettingsFromInput},
     {id:"switchMode",event:"change",f:updateSettingsFromInput},
-    {id:"oscillation",event:"change",f:updateSettingsFromInput}
+    {id:"oscillation",event:"change",f:updateSettingsFromInput},
+    {id:"obstacles",event:"change",f:updateSettingsFromInput}
   ];
   componentMap.forEach((item) => {
     const comp = document.getElementById(item.id);
@@ -455,6 +472,7 @@
     settings.setBoidSize(document.getElementById("boidSize").value);
     settings.setMode(document.getElementById("switchMode").value);
     settings.setOscillation(document.getElementById("oscillation").checked);
+    settings.setObstacles(document.getElementById("obstacles").checked);
   }
   function clickBackground(ev) {
     for(let boid of scene.boids){
@@ -474,7 +492,7 @@
 
   // Time Management
   window.requestAnimationFrame(timer);
-  function timer() { //TODO: migrate https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
+  function timer() {
     if(settings.play){
       scene.render();
       window.requestAnimationFrame(timer);

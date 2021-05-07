@@ -22,7 +22,8 @@ let componentMap = [
   {id:"speedModifier",event:"change",f:updateSettingsFromInput},
   {id:"boidSize",event:"change",f:updateSettingsFromInput},
   {id:"switchMode",event:"change",f:updateSettingsFromInput},
-  {id:"oscillation",event:"change",f:updateSettingsFromInput}
+  {id:"oscillation",event:"change",f:updateSettingsFromInput},
+  {id:"obstacles",event:"change",f:updateSettingsFromInput}
 ];
 componentMap.forEach((item) => {
   const comp = document.getElementById(item.id);
@@ -41,6 +42,7 @@ function updateSettingsFromInput() {
   settings.setBoidSize(document.getElementById("boidSize").value);
   settings.setMode(document.getElementById("switchMode").value);
   settings.setOscillation(document.getElementById("oscillation").checked);
+  settings.setObstacles(document.getElementById("obstacles").checked);
 }
 function clickBackground(ev) {
   for(let boid of scene.boids){
@@ -60,7 +62,7 @@ function clear() {
 
 // Time Management
 window.requestAnimationFrame(timer);
-function timer() { //TODO: migrate https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
+function timer() {
   if(settings.play){
     scene.render();
     window.requestAnimationFrame(timer);

@@ -5,7 +5,6 @@ import shape from './shape.js';
 export default class boid {
   constructor(scene) {
     this.scene = scene;
-    //this.scene.settings = settings || new _settings();
     this.selected = false;
     this.id = this.scene.settings.generateId();
     this.friends = [];
@@ -71,12 +70,15 @@ export default class boid {
               boid = this.scene.boids.find(boid=>boid.id==shape.boidId);
               this.friends.push(boid);
             } if(delta.distance < sFactor*range.collision.boid){ // avoid boid collision
-              this.steerClear(boid.phi);
+              this.steer(boid.phi);
             }
             break;
           case "line":
             if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
-              this.steerClear(delta.angle);
+              if(shape.name == "topWall" || shape.name == "bottomWall"){
+                console.log("yo");
+              }
+              this.steer(delta.angle);
             }
             break;
           default:
@@ -113,14 +115,10 @@ updateSpeedVector(){
    }
    this.phi = sum/(this.friends.length+1);
  }
- steerClear(phi){
-   let delta = this.phi-phi;
-   if(delta!=0) this.phi += delta/Math.abs(delta)*5;
+ steer(delta){
+   if(delta!=0) this.phi += delta/Math.abs(delta)*5*this.scene.settings.speedModifier;
  }
- // ---------------- Speed - Eval ---------------- //
- alpha(x,y){
-   return y < 0 ? x/Math.abs(x)*180 : 0;
- }
+
  // ---------------- Debug ---------------- //
  logger(string){
    if(this.selected) console.log(string);

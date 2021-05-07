@@ -28,6 +28,13 @@ export default class scene {
     this.shapes.push(new shape(this.settings,{name:"leftWall",type:"line",coord:{x0:this.xmin,y0:this.ymin,x1:this.xmin,y1:this.ymax}}));
     this.shapes.push(new shape(this.settings,{name:"bottomWall",type:"line",coord:{x0:this.xmin,y0:this.ymax,x1:this.xmax,y1:this.ymax}}));
     this.shapes.push(new shape(this.settings,{name:"rightWall",type:"line",coord:{x0:this.xmax,y0:this.ymax,x1:this.xmax,y1:this.ymin}}));
+    if(this.settings.obstacles){
+      this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*10,y0:(this.ymax-this.ymin)*.4,x1:edge*20,y1:(this.ymax-this.ymin)*.6}}));
+      this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*20,y0:(this.ymax-this.ymin)*.6,x1:edge*30,y1:(this.ymax-this.ymin)*.4}}));
+      this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*30,y0:(this.ymax-this.ymin)*.4,x1:edge*40,y1:(this.ymax-this.ymin)*.6}}));
+      this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*40,y0:(this.ymax-this.ymin)*.6,x1:edge*50,y1:(this.ymax-this.ymin)*.4}}));
+      this.shapes.push(new shape(this.settings,{name:"obstacle",type:"line",coord:{x0:edge*50,y0:(this.ymax-this.ymin)*.4,x1:this.xmax,y1:this.ymax}}));
+    }
     //shapes.push(new shape(settings,"grid","grid",{step:10},"#ddd"));
   }
 

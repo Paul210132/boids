@@ -8,6 +8,7 @@ export default class settings {
     this.night = params.night ? params.night : false;
     this.interval  = params.interval ? params.interval : 50;
     this.oscillation  = params.oscillation ? params.oscillation : false;
+    this.obstacles  = params.obstacles ? params.obstacles : false;
     this.currentId = 1;
   }
   setSpeedModifier(speedModifier) {
@@ -24,6 +25,9 @@ export default class settings {
   }
   setOscillation(oscillation) {
       this.oscillation = oscillation;
+  }
+  setObstacles(obstacles) {
+      this.obstacles = obstacles;
   }
   togglePlay(){
       this.play = !this.play;
