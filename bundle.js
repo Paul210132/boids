@@ -220,19 +220,19 @@
       if(coord.x0==coord.x1){ // Case 1 : line is vertical
         delta = {
           distance: Math.abs(this.coord.x-coord.x0),
-          angle:this.coord.phi
+          angle:this.coord.phi%360
         };
       } else if (coord.y0==coord.y1) { // Case 2 : line is horizontal
         delta = {
           distance: Math.abs(this.coord.y-coord.y0),
-          angle:this.coord.phi-90
+          angle:Math.abs(this.coord.phi-90)%360
         };
       } else { // Case 3 : line is skewed
         let dx = coord.x1 - coord.x0;
         let dy = coord.y1 - coord.y0;
         delta = {
           distance: Math.abs(dx*(coord.y0-this.coord.y)-dy*(coord.x0-this.coord.x))/Math.sqrt(dx*dx+dy*dy),
-          angle:Math.atan(dy/dx)-thi.coord.phi
+          angle:Math.atan(dy/dx)-this.coord.phi
         };
       }
       return delta;
@@ -318,9 +318,6 @@
               break;
             case "line":
               if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
-                if(shape.name == "topWall" || shape.name == "bottomWall"){
-                  console.log("yo");
-                }
                 this.steer(delta.angle);
               }
               break;

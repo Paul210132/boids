@@ -75,9 +75,6 @@ export default class boid {
             break;
           case "line":
             if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
-              if(shape.name == "topWall" || shape.name == "bottomWall"){
-                console.log("yo");
-              }
               this.steer(delta.angle);
             }
             break;
