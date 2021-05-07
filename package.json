@@ -32,6 +32,7 @@
     "serve": "^11.3.2"
   },
   "dependencies": {
+    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.0"
   }
 }
