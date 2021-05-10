@@ -16,7 +16,7 @@ let componentMap = [
   {id:"canvas",event:"click",f:clickBackground},
   {id:"clickToAddBoid",event:"click",f:clickToAddBoid},
   {id:"clear",event:"click",f:clear},
-  {id:"togglePlay",event:"click",f:togglePlay},
+  // {id:"togglePlay",event:"click",f:togglePlay},
   {id:"toggleNight",event:"click",f:toggleNight},
   {id:"edgeWidth",event:"change",f:updateSettingsFromInput},
   {id:"speedModifier",event:"change",f:updateSettingsFromInput},

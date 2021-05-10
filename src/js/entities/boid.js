@@ -30,8 +30,8 @@ export default class boid {
 
   // ---------------- UI ---------------- //
   updateBoid(){
-    this.solveBehavior();
     this.updateSpeedVector();
+    this.solveBehavior();
     this.incrementPosition();
     this.updateShape();
     this.logger(this.toString());
@@ -75,7 +75,10 @@ export default class boid {
             break;
           case "line":
             if(delta.distance < sFactor*range.collision.wall){ // avoid obstacle collision
-              this.steer(delta.angle);
+              //this.selectBoid();
+              let slowdown = (1-Math.exp(-delta.distance/sFactor))
+              this.updateSpeedVector(slowdown);
+              this.steer(slowdown*delta.angle);
             }
             break;
           default:
@@ -100,10 +103,10 @@ incrementPosition(){
 }
 
 // ---------------- Speed - Modify ---------------- //
-updateSpeedVector(){
+updateSpeedVector(r){
   this.vx = -this.r*Math.sin(this.phi);
-  this.vy = this.r*Math.cos(this.phi)
-  this.r = this.scene.settings.speedModifier;
+  this.vy = this.r*Math.cos(this.phi);
+  this.r = r*this.scene.settings.speedModifier || this.scene.settings.speedModifier;
 }
  flock(){
    let sum = this.phi;
@@ -121,7 +124,7 @@ updateSpeedVector(){
    if(this.selected) console.log(string);
  }
  toString(){
-   return ("Boid#"+this.id+"\nx: "+this.x+"\ny: "+this.y+"\nvx: "+this.vx+"\nvy: "+this.vy+"\nphi: "+this.phi);
+   return ("Boid#"+this.id+"\nx: "+this.x+"\ny: "+this.y+"\nvx: "+this.vx+"\nvy: "+this.vy+"\nphi: "+this.phi+"\nr: "+this.r);
  }
  selectBoid() {
    this.selected = !this.selected;
